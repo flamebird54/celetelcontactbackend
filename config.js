@@ -20,13 +20,13 @@ const config = {
         DB: {
             HOST: "0.0.0.0",
             PORT: "27017",
-            DATABASE: "contactus",
+            DATABASE: "celtelcontact",
             MONGOOSE: {
                 useUndifinedTopology: true,
                 useNewUrlParser: true
             },
             UserName: "manishpatra254",
-            Password: "VqbsmbCmVW0wev1f"
+            Password: "pXNP639DaYZFwTJs"
         },
         email: {
             username: "flmebird@gmail.com",
