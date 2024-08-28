@@ -3,6 +3,7 @@ import { mongoconnection } from "./db"
 import bodyParser from 'body-parser';
 
 
+
 var app = express();
 import cors from 'cors'
 import auth from './routes/apis'
@@ -12,6 +13,8 @@ app.use(cors({ origin: '*' }));
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+
+
 app.use(bodyParser.json())
 
 app.get("/", (req, res) => {
