@@ -111,6 +111,7 @@ export const contactusInfo = async (req, res) => {
 
         // Slack Webhook URL from environment variables
         const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL;
+        console.log("Slack Webhook URL:", slackWebhookUrl);
 
         // Send the message to Slack
         const slackMessage = {
