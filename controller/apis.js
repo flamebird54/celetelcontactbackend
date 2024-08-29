@@ -106,21 +106,42 @@ export const contactusInfo = async (req, res) => {
     try {
         const { name, email, phone, projectType, message } = req.body;
 
+        // Basic validation
+        if (!name || !email || !phone || !projectType || !message) {
+            return res.status(400).json({ success: false, msg: 'Name, email, phone , projectType and message are required.' });
+        }
+
         // Save the contact info in MongoDB
         const result = await contactUs.create({ name, email, phone, projectType, message });
 
-        // Slack Webhook URL from environment variables
-        const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL;
-        console.log("Slack Webhook URL:", slackWebhookUrl);
+        const slackOAuthToken = process.env.SLACK_OAUTH_TOKEN;
+        const slackChannelId = process.env.SLACK_CHANNEL_ID;
 
-        // Send the message to Slack
+        if (!slackOAuthToken || !slackChannelId) {
+            console.error('Slack OAuth token or channel ID is not configured.');
+            return res.status(500).json({ success: false, msg: 'Slack integration is not configured properly.' });
+        }
+
+        // Slack message payload
         const slackMessage = {
+            channel: slackChannelId,
             text: `*New Contact Form Submission from Celetel*\n\n*User Information:*\n- *Name:* ${name}\n- *Email:* ${email}\n- *Phone:* ${phone}\n- *Project Type:* ${projectType}\n- *Message:* ${message}`
         };
 
+        try {
+            // Send the message using Slack Web API
+            await axios.post('https://slack.com/api/chat.postMessage', slackMessage, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${slackOAuthToken}`
+                }
+            });
+        } catch (slackError) {
+            console.error('Error sending message to Slack:', slackError.response ? slackError.response.data : slackError.message);
+            return res.status(500).json({ success: false, msg: 'Failed to send message to Slack.' });
+        }
 
-        await axios.post(slackWebhookUrl, slackMessage);
-
+        // Respond with success
         res.status(200).json({
             success: true,
             msg: 'Thank you for getting in touch! We will connect with you shortly.',
@@ -128,6 +149,6 @@ export const contactusInfo = async (req, res) => {
         });
     } catch (error) {
         console.error('Error in contactusInfo:', error);
-        res.status(400).json({ success: false, msg: error.message });
+        res.status(400).json({ success: false, msg: 'An error occurred while processing your request.' });
     }
 };
