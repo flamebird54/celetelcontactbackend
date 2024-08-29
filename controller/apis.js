@@ -108,7 +108,7 @@ export const contactusInfo = async (req, res) => {
 
         // Basic validation
         if (!name || !email || !phone || !projectType || !message) {
-            return res.status(400).json({ success: false, msg: 'Name, email, phone , projectType and message are required.' });
+            return res.status(400).json({ success: false, msg: 'Name, email, phone, projectType, and message are required.' });
         }
 
         // Save the contact info in MongoDB
@@ -130,12 +130,19 @@ export const contactusInfo = async (req, res) => {
 
         try {
             // Send the message using Slack Web API
-            await axios.post('https://slack.com/api/chat.postMessage', slackMessage, {
+            const response = await axios.post('https://slack.com/api/chat.postMessage', slackMessage, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${slackOAuthToken}`
                 }
             });
+
+            if (response.data.ok) {
+                console.log('Message sent to Slack successfully.');
+            } else {
+                console.error('Failed to send message to Slack:', response.data.error);
+                return res.status(500).json({ success: false, msg: `Failed to send message to Slack: ${response.data.error}` });
+            }
         } catch (slackError) {
             console.error('Error sending message to Slack:', slackError.response ? slackError.response.data : slackError.message);
             return res.status(500).json({ success: false, msg: 'Failed to send message to Slack.' });
