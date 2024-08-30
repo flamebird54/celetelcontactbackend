@@ -106,7 +106,7 @@ export const contactusInfo = async (req, res) => {
     try {
         const { name, email, phone, projectType, message } = req.body;
 
-        // Basic validation
+        // Basic validation .... 
         if (!name || !email || !phone || !projectType || !message) {
             return res.status(400).json({ success: false, msg: 'Name, email, phone, projectType, and message are required.' });
         }
@@ -138,7 +138,7 @@ export const contactusInfo = async (req, res) => {
             });
 
             if (response.data.ok) {
-                console.log('Message sent to Slack successfully.');
+                console.log('Message sent to Slack successfully.', response.data.ok);
             } else {
                 console.error('Failed to send message to Slack:', response.data.error);
                 return res.status(500).json({ success: false, msg: `Failed to send message to Slack: ${response.data.error}` });
